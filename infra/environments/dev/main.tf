@@ -32,14 +32,14 @@ data "aws_subnets" "private" {
 }
 
 locals {
-  vpc_id     = var.use_existing_vpc ? data.aws_vpc.existing[0].id : module.vpc[0].vpc_id
-  public_subnets = var.use_existing_vpc ? data.aws_subnets.public[0].ids : module.vpc[0].public_subnets
+  vpc_id          = var.use_existing_vpc ? data.aws_vpc.existing[0].id : module.vpc[0].vpc_id
+  public_subnets  = var.use_existing_vpc ? data.aws_subnets.public[0].ids : module.vpc[0].public_subnets
   private_subnets = var.use_existing_vpc ? data.aws_subnets.private[0].ids : module.vpc[0].private_subnets
 }
 
 module "vpc" {
-  count  = var.use_existing_vpc ? 0 : 1
-  source = "terraform-aws-modules/vpc/aws"
+  count   = var.use_existing_vpc ? 0 : 1
+  source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"
 
   name = "wiz-exercise-vpc"
@@ -72,14 +72,14 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
-      desired_size = 2
-      min_size     = 1
-      max_size     = 3
+      desired_size   = 2
+      min_size       = 1
+      max_size       = 3
       instance_types = ["t3.medium"]
     }
   }
 
-  }
+}
 
 module "db_sg" {
   source  = "terraform-aws-modules/security-group/aws"
@@ -113,9 +113,9 @@ module "db_vm_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "~> 5.0"
 
-  create_role = true
-  role_name   = "wiz-exercise-db-vm-role"
-  trusted_role_services = ["ec2.amazonaws.com"]
+  create_role             = true
+  role_name               = "wiz-exercise-db-vm-role"
+  trusted_role_services   = ["ec2.amazonaws.com"]
   create_instance_profile = true
 
   custom_role_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
@@ -168,7 +168,7 @@ module "backup_bucket" {
       Effect    = "Allow"
       Principal = "*"
       Action    = ["s3:GetObject", "s3:ListBucket"]
-      Resource  = [
+      Resource = [
         "arn:aws:s3:::wiz-exercise-backups-${random_id.suffix.hex}",
         "arn:aws:s3:::wiz-exercise-backups-${random_id.suffix.hex}/*"
       ]
