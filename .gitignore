@@ -1,0 +1,9 @@
+node_modules/
+.terraform/
+*.tfplan
+tfplan
+*.tfstate
+*.tfstate.backup
+Progress notes.yaml
+session-ses_238a.md
+docs/cli-operations.md

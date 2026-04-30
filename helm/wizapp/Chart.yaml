@@ -1,0 +1,6 @@
+apiVersion: v2
+name: wizapp
+description: A minimal Node.js/Express task app for the Wiz Support Technical Exercise
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

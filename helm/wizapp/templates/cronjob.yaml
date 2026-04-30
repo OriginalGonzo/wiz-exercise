@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "wizapp.fullname" . }}-mongodb-backup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "wizapp.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  schedule: {{ .Values.backup.schedule | default "0 * * * *" }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "wizapp.fullname" . }}-mongodb-backup
+          containers:
+            - name: mongodump
+              image: mongo:7.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  apt-get update && apt-get install -y curl unzip && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install
+                  DATE=$(date +%Y%m%d_%H%M%S)
+                  mongodump --uri="$MONGODB_URI" --out=/tmp/dump_$DATE
+                  tar -czf /tmp/backup_$DATE.tar.gz -C /tmp dump_$DATE
+                  aws s3 cp /tmp/backup_$DATE.tar.gz s3://{{ .Values.backup.bucket }}/
+                  rm -rf /tmp/dump_$DATE /tmp/backup_$DATE.tar.gz
+              env:
+                - name: MONGODB_URI
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "wizapp.fullname" . }}-db
+                      key: uri
+                - name: AWS_DEFAULT_REGION
+                  value: {{ .Values.backup.awsRegion }}

@@ -1,0 +1,20 @@
+image:
+  repository: ghcr.io/originalgonzo/wiz-exercise-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: LoadBalancer
+  port: 80
+
+db:
+  uri: "mongodb://admin:changeme@10.0.1.216:27017/wizapp?authSource=admin"
+
+backup:
+  enabled: true
+  bucket: "wiz-exercise-backups-1bb33f06a27042fb"
+  awsRegion: "us-east-1"
+  schedule: "0 * * * *"
+  irsaRoleArn: "arn:aws:iam::539247471350:role/wiz-exercise-backup-role"

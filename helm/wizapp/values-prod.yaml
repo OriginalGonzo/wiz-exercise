@@ -1,0 +1,7 @@
+replicaCount: 3
+
+db:
+  uri: "mongodb://admin:changeme@<db-private-ip>:27017/wizapp?authSource=admin"
+
+backup:
+  enabled: true
