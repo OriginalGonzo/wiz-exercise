@@ -1,7 +1,7 @@
 image:
   repository: ghcr.io/originalgonzo/wiz-exercise-app
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 replicaCount: 2
 
