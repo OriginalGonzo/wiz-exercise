@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/wiz-exercise-app
+  IMAGE_NAME: ${{ github.repository_owner }}/wiz-exercise-app
 
 jobs:
   build:
@@ -17,8 +17,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      image_sha: ${{ github.sha }}
+      image_tag: ${{ steps.meta.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,10 +46,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository_owner }}/wiz-exercise-app
     steps:
       - uses: actions/checkout@v4
 
@@ -83,6 +87,10 @@ jobs:
         run: |
           helm upgrade --install wizapp ./helm/wizapp \
             --namespace wizapp \
-            --set image.tag=${{ github.sha }} \
+            --set image.tag=${{ needs.build.outputs.image_tag }} \
             --set image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            --set db.uri="${{ secrets.MONGODB_URI }}" \
+            --set backup.bucket=${{ secrets.BACKUP_BUCKET }} \
+            --set backup.awsRegion=${{ secrets.AWS_REGION }} \
+            --set backup.irsaRoleArn=${{ secrets.BACKUP_IRSA_ROLE_ARN }} \
             --wait --timeout 5m

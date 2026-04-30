@@ -10,11 +10,11 @@ service:
   port: 80
 
 db:
-  uri: "mongodb://admin:changeme@10.0.1.216:27017/wizapp?authSource=admin"
+  uri: ""
 
 backup:
   enabled: true
-  bucket: "wiz-exercise-backups-1bb33f06a27042fb"
+  bucket: ""
   awsRegion: "us-east-1"
   schedule: "0 * * * *"
-  irsaRoleArn: "arn:aws:iam::539247471350:role/wiz-exercise-backup-role"
+  irsaRoleArn: ""
