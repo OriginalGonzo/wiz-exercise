@@ -22,5 +22,12 @@ app.post('/tasks', async (req, res) => {
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next(err);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
